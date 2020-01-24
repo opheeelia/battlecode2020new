@@ -8,7 +8,7 @@ public class Communications {
     // state related only to communications should go here
 
     // all messages from our team should start with this so we can tell them apart
-    static final int teamSecret = 444444444;
+    static final int teamSecret = 120120010;
     // the second entry in every message tells us what kind of message it is. e.g. 0 means it contains the HQ location
     static final String[] messageType = {
         "HQ loc",
