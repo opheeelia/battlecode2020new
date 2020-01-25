@@ -15,6 +15,13 @@ public class Util {
         Direction.WEST,
         Direction.NORTHWEST
     };
+    
+    static Direction[] cornerDirections = {
+        Direction.NORTHEAST,
+        Direction.SOUTHEAST,
+        Direction.SOUTHWEST,
+        Direction.NORTHWEST
+    };
 
     /**
      * Returns a random Direction.

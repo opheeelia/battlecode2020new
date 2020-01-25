@@ -2,6 +2,8 @@ package landscapers;
 import battlecode.common.*;
 
 public class Landscaper extends Unit {
+	
+	boolean north, east, south, west, stationed = false;
 
     public Landscaper(RobotController r) {
         super(r);
@@ -21,6 +23,31 @@ public class Landscaper extends Unit {
         if(rc.getDirtCarrying() == 0){
             tryDig();
         }
+        
+        //rotate around HQ until you can stand in north, east, south, or west of it. if near hq
+        
+        if (!stationed && hqLoc != null && hqLoc.isWithinDistanceSquared(rc.getLocation(), 4)) {
+            for(Direction dir: Util.cornerDirections) {
+                if(rc.getLocation().equals(hqLoc.add(dir))) {
+                	stationed = true;
+                	System.out.println("im stationed");
+                }
+            }
+            if (!stationed) {
+	            Direction hqDir = rc.getLocation().directionTo(hqLoc);
+	        	Direction[] toTry = {hqDir, hqDir.rotateRight(), hqDir.rotateRight().rotateRight()};
+	            for (Direction d : toTry){
+	                if(nav.tryMove(d)) {
+	                	System.out.println("rotating around the hq");
+	                }
+	            }
+            }
+        }
+        
+        //IF NEAR HQ
+        //for loop to check if its in the right place
+        //if not stationed by the end of for loop, then move. 
+
 
         MapLocation bestPlaceToBuildWall = null;
         // find best place to build
@@ -33,25 +60,28 @@ public class Landscaper extends Unit {
                     if (rc.senseElevation(tileToCheck) < lowestElevation) {
                         lowestElevation = rc.senseElevation(tileToCheck);
                         bestPlaceToBuildWall = tileToCheck;
+                        System.out.println("found place to build: " + bestPlaceToBuildWall);
                     }
                 }
             }
         }
 
-        if (Math.random() < 0.8){
+        if (stationed){
             // build the wall
             if (bestPlaceToBuildWall != null) {
                 rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
                 rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
                 System.out.println("building a wall");
             }
-        }
-
-        // otherwise try to get to the hq
-        if(hqLoc != null){
-            nav.goTo(hqLoc);
-        } else {
-            nav.goTo(Util.randomDirection());
+        }else {
+	        // otherwise try to get to the hq
+	        if(hqLoc != null){
+	            nav.goTo(hqLoc);
+	            System.out.println("trying to get to hq");
+	        } else {
+	            nav.goTo(Util.randomDirection());
+	            System.out.println("tryna move random");
+	        }
         }
     }
 
