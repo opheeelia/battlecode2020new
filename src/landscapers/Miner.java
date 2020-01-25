@@ -32,8 +32,11 @@ public class Miner extends Unit {
                 System.out.println("I refined soup! " + rc.getTeamSoup());
 
         if (numDesignSchools < 3){
-            if(tryBuild(RobotType.DESIGN_SCHOOL, Util.randomDirection()))
-                System.out.println("created a design school");
+        	//pick direction
+        	Direction dir = Util.randomDirection();
+    		if(!rc.getLocation().add(dir).isAdjacentTo(hqLoc))
+    			if(tryBuild(RobotType.DESIGN_SCHOOL, dir))
+                    System.out.println("created a design school");
         }
 
         if (rc.getSoupCarrying() == RobotType.MINER.soupLimit) {
