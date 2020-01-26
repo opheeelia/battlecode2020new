@@ -3,7 +3,7 @@ import battlecode.common.*;
 
 public class Landscaper extends Unit {
 	
-	boolean north, east, south, west, stationed = false;
+	boolean nw, ne, sw, se, stationed = false;
 
     public Landscaper(RobotController r) {
         super(r);
@@ -25,48 +25,58 @@ public class Landscaper extends Unit {
         }
         
         //rotate around HQ until you can stand in north, east, south, or west of it. if near hq
-        
-        if (!stationed && hqLoc != null && hqLoc.isWithinDistanceSquared(rc.getLocation(), 4)) {
-            for(Direction dir: Util.cornerDirections) {
+        if (!stationed && hqLoc != null && hqLoc.isWithinDistanceSquared(rc.getLocation(), 9)) {
+        	for(Direction dir: Util.cornerDirections) {
                 if(rc.getLocation().equals(hqLoc.add(dir))) {
                 	stationed = true;
                 	System.out.println("im stationed");
                 }
             }
             if (!stationed) {
+            	MapLocation corner = null;
+            	for(Direction dir: Util.cornerDirections) {
+            		if (rc.senseRobotAtLocation(hqLoc.add(dir)) == null ||
+            				rc.senseRobotAtLocation(hqLoc.add(dir)).getType() != RobotType.LANDSCAPER){
+            			corner = hqLoc.add(dir);
+            			break;
+            		}
+            	}
+            	
+            	if(corner != null) {
+            		if(nav.goTo(corner))
+            			System.out.println("going to corner " + corner);
+            	}else {
+            		if(nav.goTo(hqLoc)) {
+            			stationed = true;
+            			System.out.println("gonna try to station at hq");
+            		}
+            	}
+            	/* OLD CODE - rotates around the HQ 
 	            Direction hqDir = rc.getLocation().directionTo(hqLoc);
-	        	Direction[] toTry = {hqDir, hqDir.rotateRight(), hqDir.rotateRight().rotateRight()};
+	        	Direction[] toTry = {hqDir, hqDir.rotateRight().rotateRight(), hqDir.rotateRight()};
 	            for (Direction d : toTry){
+	            	System.out.println("test location " + rc.getLocation().add(d));
 	                if(nav.tryMove(d)) {
 	                	System.out.println("rotating around the hq");
-	                }
-	            }
+            	 */
             }
-        }
-        
-        //IF NEAR HQ
-        //for loop to check if its in the right place
-        //if not stationed by the end of for loop, then move. 
-
-
-        MapLocation bestPlaceToBuildWall = null;
-        // find best place to build
-        if(hqLoc != null) {
-            int lowestElevation = 9999999;
-            for (Direction dir : Util.directions) {
-                MapLocation tileToCheck = hqLoc.add(dir);
-                if(rc.getLocation().distanceSquaredTo(tileToCheck) < 4
-                        && rc.canDepositDirt(rc.getLocation().directionTo(tileToCheck))) {
-                    if (rc.senseElevation(tileToCheck) < lowestElevation) {
-                        lowestElevation = rc.senseElevation(tileToCheck);
-                        bestPlaceToBuildWall = tileToCheck;
-                        System.out.println("found place to build: " + bestPlaceToBuildWall);
+        }else if (stationed) {
+            MapLocation bestPlaceToBuildWall = null;
+            // find best place to build
+            if(hqLoc != null) {
+                int lowestElevation = 9999999;
+                for (Direction dir : Util.directions) {
+                    MapLocation tileToCheck = hqLoc.add(dir);
+                    if(rc.getLocation().distanceSquaredTo(tileToCheck) < 4
+                            && rc.canDepositDirt(rc.getLocation().directionTo(tileToCheck))) {
+                        if (rc.senseElevation(tileToCheck) < lowestElevation) {
+                            lowestElevation = rc.senseElevation(tileToCheck);
+                            bestPlaceToBuildWall = tileToCheck;
+                            System.out.println("found place to build: " + bestPlaceToBuildWall);
+                        }
                     }
                 }
             }
-        }
-
-        if (stationed){
             // build the wall
             if (bestPlaceToBuildWall != null) {
                 rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
@@ -76,13 +86,14 @@ public class Landscaper extends Unit {
         }else {
 	        // otherwise try to get to the hq
 	        if(hqLoc != null){
-	            nav.goTo(hqLoc);
-	            System.out.println("trying to get to hq");
+	            if(nav.goTo(hqLoc))
+	            	System.out.println("going to hq");
 	        } else {
 	            nav.goTo(Util.randomDirection());
 	            System.out.println("tryna move random");
 	        }
         }
+
     }
 
     boolean tryDig() throws GameActionException {
