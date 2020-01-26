@@ -34,6 +34,19 @@ public class Navigation {
         return false;
     }
 
+    boolean rotateTo(Direction dir) throws GameActionException {
+        Direction[] toTry = {dir, dir.rotateRight(), dir.rotateRight().rotateRight()};
+        for (Direction d : toTry){
+            if(tryMove(d))
+                return true;
+        }
+        return false;
+    }
+    
+    boolean rotateTo(MapLocation destination) throws GameActionException {
+    	return rotateTo(rc.getLocation().directionTo(destination));
+    }
+
     // navigate towards a particular location
     boolean goTo(MapLocation destination) throws GameActionException {
         return goTo(rc.getLocation().directionTo(destination));

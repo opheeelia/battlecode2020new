@@ -3,7 +3,7 @@ import battlecode.common.*;
 
 public class Landscaper extends Unit {
 	
-	boolean nw, ne, sw, se, stationed = false;
+	boolean stationed = false;
 
     public Landscaper(RobotController r) {
         super(r);
@@ -43,7 +43,7 @@ public class Landscaper extends Unit {
             	}
             	
             	if(corner != null) {
-            		if(nav.goTo(corner))
+            		if(nav.rotateTo(corner))
             			System.out.println("going to corner " + corner);
             	}else {
             		if(nav.goTo(hqLoc)) {
@@ -51,7 +51,8 @@ public class Landscaper extends Unit {
             			System.out.println("gonna try to station at hq");
             		}
             	}
-            	/* OLD CODE - rotates around the HQ 
+            	/* OLD CODE - rotates around the HQ. change hq.withinDistance to 4 if use!!
+            	 * 
 	            Direction hqDir = rc.getLocation().directionTo(hqLoc);
 	        	Direction[] toTry = {hqDir, hqDir.rotateRight().rotateRight(), hqDir.rotateRight()};
 	            for (Direction d : toTry){
