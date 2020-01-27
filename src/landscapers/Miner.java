@@ -20,7 +20,7 @@ public class Miner extends Unit {
             numDesignSchools += comms.getNewDesignSchoolCount();
         }
         
-        if (numRefineries < 2) {
+        if (numRefineries < 1) {
             MapLocation loc = comms.getNewRefineryLocation();
             if (loc.x != -1000){
                 numRefineries += 1;
@@ -52,7 +52,7 @@ public class Miner extends Unit {
                     System.out.println("created a design school");
         }
 
-        if (numRefineries < 2){
+        if (numRefineries < 1){
             System.out.println("trying to build a refinery!");
         	//pick direction
         	Direction dir = Util.randomDirection();
