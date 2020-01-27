@@ -20,7 +20,7 @@ public class Miner extends Unit {
             numDesignSchools += comms.getNewDesignSchoolCount();
         }
         
-        if (numRefineries == 0) {
+        if (numRefineries < 2) {
             MapLocation loc = comms.getNewRefineryLocation();
             if (loc.x != -1000){
                 numRefineries += 1;
@@ -52,21 +52,22 @@ public class Miner extends Unit {
                     System.out.println("created a design school");
         }
 
-        if (numRefineries < 1){
+        if (numRefineries < 2){
             System.out.println("trying to build a refinery!");
         	//pick direction
         	Direction dir = Util.randomDirection();
     		if(!rc.getLocation().add(dir).isAdjacentTo(hqLoc))
-    			if(tryBuild(RobotType.REFINERY, dir))
+    			if(tryBuild(RobotType.REFINERY, dir)) {
                     System.out.println("created a refinery");
+                }
         }
 
         if (rc.getSoupCarrying() == RobotType.MINER.soupLimit) {
-            // time to go back to the HQ
+            // first attempt to go back to a refinery, if any
             if(refineryLocations.size() > 0){
                 if(nav.goTo(refineryLocations.get(0)))
                     System.out.println("moved towards refinary");
-            }
+            } // otherwise refine at HQ 
             else if (nav.goTo(hqLoc))
                 System.out.println("moved towards HQ");
         } else if (soupLocations.size() > 0) {
