@@ -108,6 +108,14 @@ public class Landscaper extends Unit {
             rc.digDirt(dir);
             rc.setIndicatorDot(rc.getLocation().add(dir), 255, 0, 0);
             return true;
+        }else {
+            Direction[] toTry = {dir.rotateLeft(), dir.rotateRight(), dir.rotateLeft().rotateLeft(), dir.rotateRight().rotateRight()};
+            for (Direction d : toTry){
+                if(rc.canDigDirt(d)) {
+                	rc.digDirt(d);
+                    return true;
+                }
+            }
         }
         return false;
     }
