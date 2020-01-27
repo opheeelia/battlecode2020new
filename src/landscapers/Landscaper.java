@@ -25,7 +25,10 @@ public class Landscaper extends Unit {
         }
         
         //rotate around HQ until you can stand in north, east, south, or west of it. if near hq
-        if (!stationed && hqLoc != null && hqLoc.isWithinDistanceSquared(rc.getLocation(), 9)) {
+        
+        if(turnCount >= 300 && rc.getLocation().distanceSquaredTo(hqLoc) < 4) {
+        	buildWall();
+        }else if (!stationed && hqLoc != null && hqLoc.isWithinDistanceSquared(rc.getLocation(), 9)) {
         	for(Direction dir: Util.cornerDirections) {
                 if(rc.getLocation().equals(hqLoc.add(dir))) {
                 	stationed = true;
@@ -62,28 +65,7 @@ public class Landscaper extends Unit {
             	 */
             }
         }else if (stationed) {
-            MapLocation bestPlaceToBuildWall = null;
-            // find best place to build
-            if(hqLoc != null) {
-                int lowestElevation = 9999999;
-                for (Direction dir : Util.directions) {
-                    MapLocation tileToCheck = hqLoc.add(dir);
-                    if(rc.getLocation().distanceSquaredTo(tileToCheck) < 4
-                            && rc.canDepositDirt(rc.getLocation().directionTo(tileToCheck))) {
-                        if (rc.senseElevation(tileToCheck) < lowestElevation) {
-                            lowestElevation = rc.senseElevation(tileToCheck);
-                            bestPlaceToBuildWall = tileToCheck;
-                            System.out.println("found place to build: " + bestPlaceToBuildWall);
-                        }
-                    }
-                }
-            }
-            // build the wall
-            if (bestPlaceToBuildWall != null) {
-                rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
-                rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
-                System.out.println("building a wall");
-            }
+            buildWall();
         }else {
 	        // otherwise try to get to the hq
 	        if(hqLoc != null){
@@ -119,4 +101,30 @@ public class Landscaper extends Unit {
         }
         return false;
     }
+    
+    void buildWall() throws GameActionException{
+    	MapLocation bestPlaceToBuildWall = null;
+        // find best place to build
+        if(hqLoc != null) {
+            int lowestElevation = 9999999;
+            for (Direction dir : Util.directions) {
+                MapLocation tileToCheck = hqLoc.add(dir);
+                if(rc.getLocation().distanceSquaredTo(tileToCheck) < 4
+                        && rc.canDepositDirt(rc.getLocation().directionTo(tileToCheck))) {
+                    if (rc.senseElevation(tileToCheck) < lowestElevation) {
+                        lowestElevation = rc.senseElevation(tileToCheck);
+                        bestPlaceToBuildWall = tileToCheck;
+                        System.out.println("found place to build: " + bestPlaceToBuildWall);
+                    }
+                }
+            }
+        }
+        // build the wall
+        if (bestPlaceToBuildWall != null) {
+            rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
+            rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
+            System.out.println("building a wall");
+        }
+    }
+    
 }
