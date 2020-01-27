@@ -15,6 +15,7 @@ public class Communications {
         "design school created",
         "soup location",
         "refinery created",
+        "fulfillment created",
     };
 
     public Communications(RobotController r) {
@@ -58,7 +59,19 @@ public class Communications {
             broadcastedCreation = true;
         }
     }
+    public void broadcastFulfillmentCreation(MapLocation loc) throws GameActionException {
+        if(broadcastedCreation) return; // don't re-broadcast
 
+        int[] message = new int[7];
+        message[0] = teamSecret;
+        message[1] = 4;
+        message[2] = loc.x; // x coord of HQ
+        message[3] = loc.y; // y coord of HQ
+        if (rc.canSubmitTransaction(message, 3)) {
+            rc.submitTransaction(message, 3);
+            broadcastedCreation = true;
+        }
+    }
 
     // check the latest block for unit creation messages
     public int getNewDesignSchoolCount() throws GameActionException {
@@ -67,6 +80,19 @@ public class Communications {
             int[] mess = tx.getMessage();
             if(mess[0] == teamSecret && mess[1] == 1){
                 System.out.println("heard about a cool new school");
+                count += 1;
+            }
+        }
+        return count;
+    }
+
+    // check the latest block for unit creation messages
+    public int getNewFulfillmentCount() throws GameActionException {
+        int count = 0;
+        for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if(mess[0] == teamSecret && mess[1] == 4){
+                System.out.println("heard about a cool new fulfillment center");
                 count += 1;
             }
         }
