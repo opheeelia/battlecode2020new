@@ -13,6 +13,13 @@ public class HQ extends Shooter {
     public void takeTurn() throws GameActionException {
         super.takeTurn();
 
+        if (turnCount == 1) {
+            MapLocation[] soupLocs = rc.senseNearbySoup();
+            for(MapLocation loc : soupLocs) {
+                comms.broadcastSoupLocation(loc);
+            }
+        }
+
         if(numMiners < 5) {
             for (Direction dir : Util.directions)
                 if(tryBuild(RobotType.MINER, dir)){
