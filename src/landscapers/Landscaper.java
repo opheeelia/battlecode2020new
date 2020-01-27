@@ -45,8 +45,8 @@ public class Landscaper extends Unit {
             	if(corner != null) {
             		if(nav.rotateTo(corner))
             			System.out.println("going to corner " + corner);
-            	}else {
-            		if(nav.goTo(hqLoc)) {
+            	}else { //station outside of ring TODO: make so they go on diff sides
+            		if(nav.rotateTo(hqLoc) && rc.getLocation().isWithinDistanceSquared(hqLoc, 4)) {
             			stationed = true;
             			System.out.println("gonna try to station at hq");
             		}
