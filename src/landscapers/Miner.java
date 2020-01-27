@@ -5,7 +5,9 @@ import java.util.ArrayList;
 public class Miner extends Unit {
 
     int numDesignSchools = 0;
+    int numRefineries = 0;
     ArrayList<MapLocation> soupLocations = new ArrayList<MapLocation>();
+    ArrayList<MapLocation> refineryLocations = new ArrayList<MapLocation>();
 
     public Miner(RobotController r) {
         super(r);
@@ -14,7 +16,18 @@ public class Miner extends Unit {
     public void takeTurn() throws GameActionException {
         super.takeTurn();
 
-        numDesignSchools += comms.getNewDesignSchoolCount();
+        if (numDesignSchools == 0) {
+            numDesignSchools += comms.getNewDesignSchoolCount();
+        }
+        
+        if (numRefineries < 2) {
+            MapLocation loc = comms.getNewRefineryLocation();
+            if (loc.x != -1000){
+                numRefineries += 1;
+                refineryLocations.add(new MapLocation(loc.x, loc.y));
+            }
+        }
+
         comms.updateSoupLocations(soupLocations);
         checkIfSoupGone();
 
@@ -31,7 +44,7 @@ public class Miner extends Unit {
             if (tryRefine(dir))
                 System.out.println("I refined soup! " + rc.getTeamSoup());
 
-        if (numDesignSchools < 3){
+        if (numDesignSchools < 1){
         	//pick direction
         	Direction dir = Util.randomDirection();
     		if(!rc.getLocation().add(dir).isAdjacentTo(hqLoc))
@@ -39,9 +52,23 @@ public class Miner extends Unit {
                     System.out.println("created a design school");
         }
 
+        if (numRefineries < 2){
+            System.out.println("trying to build a refinery!");
+        	//pick direction
+        	Direction dir = Util.randomDirection();
+    		if(!rc.getLocation().add(dir).isAdjacentTo(hqLoc))
+    			if(tryBuild(RobotType.REFINERY, dir)) {
+                    System.out.println("created a refinery");
+                }
+        }
+
         if (rc.getSoupCarrying() == RobotType.MINER.soupLimit) {
-            // time to go back to the HQ
-            if(nav.goTo(hqLoc))
+            // first attempt to go back to a refinery, if any
+            if(refineryLocations.size() > 0){
+                if(nav.goTo(refineryLocations.get(0)))
+                    System.out.println("moved towards refinary");
+            } // otherwise refine at HQ 
+            else if (nav.goTo(hqLoc))
                 System.out.println("moved towards HQ");
         } else if (soupLocations.size() > 0) {
             nav.goTo(soupLocations.get(0));

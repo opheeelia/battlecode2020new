@@ -14,6 +14,7 @@ public class Communications {
         "HQ loc",
         "design school created",
         "soup location",
+        "refinery created",
     };
 
     public Communications(RobotController r) {
@@ -58,6 +59,7 @@ public class Communications {
         }
     }
 
+
     // check the latest block for unit creation messages
     public int getNewDesignSchoolCount() throws GameActionException {
         int count = 0;
@@ -69,6 +71,33 @@ public class Communications {
             }
         }
         return count;
+    }
+
+    // broadcast creation of refinery 
+    public void broadcastRefineryCreation(MapLocation loc) throws GameActionException {
+        if(broadcastedCreation) return; // don't re-broadcast
+
+        int[] message = new int[7];
+        message[0] = teamSecret;
+        message[1] = 3;
+        message[2] = loc.x; // x coord of Refinery
+        message[3] = loc.y; // y coord of Refinery
+        if (rc.canSubmitTransaction(message, 5)) {
+            rc.submitTransaction(message, 5);
+            broadcastedCreation = true;
+        }
+    }
+    // check the latest block for refinery creation messages
+    public MapLocation getNewRefineryLocation() throws GameActionException {
+        for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if(mess[0] == teamSecret && mess[1] == 3){
+                System.out.println("heard about a cool new refinary");
+                return new MapLocation(mess[2], mess[3]);
+            }
+        }
+        // if doesn't exist, return a non existent loc
+        return new MapLocation(-1000, -1000);
     }
 
     public void broadcastSoupLocation(MapLocation loc ) throws GameActionException {

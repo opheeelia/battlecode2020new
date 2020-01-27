@@ -8,6 +8,7 @@ public strictfp class RobotPlayer {
      **/
     public static void run(RobotController rc) throws GameActionException {
         Robot me = null;
+        int turnCount = 0;
 
         switch (rc.getType()) {
             case HQ:                 me = new HQ(rc);           break;
@@ -24,6 +25,7 @@ public strictfp class RobotPlayer {
         while(true) {
             try {
                 me.takeTurn();
+                turnCount++;
 
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
