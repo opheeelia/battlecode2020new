@@ -1,6 +1,7 @@
 dist/*
 build/*
-
+src/examplefuncsplayer
+src/lectureplayer
 
 /matches
 /deploy/lib
